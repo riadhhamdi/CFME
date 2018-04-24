@@ -1,0 +1,7 @@
+- hosts: all
+  become: yes
+  tasks:
+  - name: show Hello World message
+    debug: 
+      msg: "Hello World !!"
+      
