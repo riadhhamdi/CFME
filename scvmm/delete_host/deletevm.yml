@@ -1,6 +1,6 @@
 - hosts: localhost
   vars_files:
-    - params.yml 
+#    - params.yml 
     - args.yml 
   tasks:
   - name: API Call to get the VM ID
