@@ -28,6 +28,15 @@
           {
           "action" : "retire"
           }  
+    register: retire_out 
+  - name: show the retirement request ID
+    debug:
+      var: retire_out  
+   #TODO
+   # Get the request ID to be passed to service now 
+   #\TODO
+   #
+   #
    # TODO
    # Add the tasks to delete all disks on SCVMM
    # \TODO
