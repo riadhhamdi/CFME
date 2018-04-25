@@ -17,7 +17,7 @@
   - name: show variable 
     debug: 
       var: (id_out.json.resources[0]).href  
-  - name: API Call to delete VM with id "{{(id_out.json.resources[0]).id"
+  - name: API Call to delete VM with id "{{(id_out.json.resources[0]).id}}"
     uri:
       url: "{{(id_out.json.resources[0]).href}}"
       user: "{{api_username}}"
