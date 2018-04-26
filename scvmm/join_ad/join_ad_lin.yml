@@ -1,7 +1,7 @@
 # This playbook installs and configures AD authentication
 # For RHEL systems 
 - name: Install and configure AD authentication
-  hosts: '{{server}}'   
+  hosts: all   
   become: true 
   vars_files:
     - args.yml 
