@@ -7,10 +7,6 @@
     - args.yml 
     - vars.yml 
   tasks:
-  - name: Task for debug 
-    debug:
-      var: groups
-    tags: test 
   - name: Install AD authentication tools
     yum: 
       name: "{{ad_tools}}" 
@@ -26,13 +22,14 @@
     always:
     - name: Restrict access based on specific ad group
       shell: "/usr/sbin/realm permit -g {{item}} "
-      with_items: "{{ groups }}"
-      when: groups is defined 
+      with_items: "{{ grps }}"
+      when: grps is defined 
 
     - name: Restrict access based on specific ad users  
       shell: "/usr/sbin/realm permit {{item}}@{{domain}} "
       with_items: "{{ users }}"
       when: users is defined
+      notify: restart sssd 
 
     - name: Add ad_sudo_groups to sudoers
       template:
