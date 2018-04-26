@@ -1,0 +1,21 @@
+ad_tools:
+  - libselinux-python
+  - realmd
+  - sssd
+  - oddjob
+  - oddjob-mkhomedir
+  - adcli  # TODO for testing remove later 
+  - samba-common
+  - samba-common-tools
+  - ntpdate
+  - chrony  
+  - python-pip     # TODO for testing remove later 
+  - sudo
+domain: infra.bench
+groups:        # groups of users that will be permitted to login  
+  - users      # Add your groups here as items of the list 
+users:
+  - CFAdmin   # users to permit on this server 
+              # Add your users here as itms of the list 
+ad_sudo_groups: 
+  - users@infra.bench  

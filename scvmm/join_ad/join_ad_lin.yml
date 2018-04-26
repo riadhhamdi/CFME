@@ -1,0 +1,52 @@
+# This playbook installs and configures AD authentication
+# For RHEL systems 
+- name: Install and configure AD authentication
+  hosts: all   
+  become: true 
+  vars_files:
+    - args.yml 
+    - vars.yml 
+  tasks:
+  - name: Task for debug 
+    debug:
+      var: groups
+    tags: test 
+  - name: Install AD authentication tools
+    yum: 
+      name: "{{ad_tools}}" 
+      state: present
+  - block: 
+    - name: Check if machine is bound (if this task fails it s not an error)
+      shell: "/usr/sbin/realm list | grep sssd"
+      changed_when: false
+    rescue:
+
+    - name: Join system to AD and put the computer object in the Linux OU
+      shell: "echo -n {{ad_admin_pass}} | /usr/sbin/realm join -U {{ad_admin_user}} {{domain}}"
+    always:
+    - name: Restrict access based on specific ad group
+      shell: "/usr/sbin/realm permit -g {{item}} "
+      with_items: "{{ groups }}"
+      when: groups is defined 
+
+    - name: Restrict access based on specific ad users  
+      shell: "/usr/sbin/realm permit {{item}}@{{domain}} "
+      with_items: "{{ users }}"
+      when: users is defined
+
+    - name: Add ad_sudo_groups to sudoers
+      template:
+        dest: /etc/sudoers.d/ad_sudo_groups
+        src: templates/ad_sudo_groups.j2
+      when: ad_sudo_groups is defined
+
+    - name: Add ad_sudo_users to sudoers
+      template:
+        dest: /etc/sudoers.d/ad_sudo_users
+        src: templates/ad_sudo_users.j2
+      when: ad_sudo_users is defined
+  handlers:
+    - name: restart sssd
+      service:
+        name: sssd
+        state: restarted
