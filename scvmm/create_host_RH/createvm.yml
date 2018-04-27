@@ -1,0 +1,45 @@
+- hosts: localhost
+  vars_files:
+    - params.yml 
+    - args.yml 
+  tasks:
+  - name: Launch the provision request (API Call)
+    uri:
+      url: "https://{{cfme_ip}}/api/provision_requests"    # default to https://<CFME>/api/provision_requests/
+      user: "{{api_username}}"
+      password: "{{api_password}}"
+      validate_certs: false
+      method: POST
+      body:
+        template_fields:
+          guid: "{{template_guid}}"   #be careful when choosing the template guid if (it s incorrect error 500 internal error)
+        requester:
+          owner_email: "{{owner_email}}"
+        vm_fields: 
+          vm_name: "{{vm_name}}"
+          number_of_sockets: "{{cpus}}"
+          vm_memory: "{{memory}}"
+      body_format: json 
+    register: provision_out 
+  - name: Starting tracking the request {{ provision_out.json.results[0].id }}  
+    debug:
+      var: provision_out.json.results[0].href 
+  - block: 
+    - name: Check the request status
+      uri:
+        url: "{{provision_out.json.results[0].href}}"    # default to https://<CFME>/api/provision_requests/
+        user: "{{api_username}}"
+        password: "{{api_password}}"
+        validate_certs: false
+        method: GET
+      register: check_request_status_out 
+    - name: Show the output 
+      debug: 
+        var: check_request_status_out.json.request_state 
+    #until: false 
+ 
+    
+    
+   #TODO
+   # Get the request ID to be passed to service now 
+   #\TODO
