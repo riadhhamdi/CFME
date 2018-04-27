@@ -24,22 +24,44 @@
   - name: Starting tracking the request {{ provision_out.json.results[0].id }}  
     debug:
       var: provision_out.json.results[0].href 
-  - block: 
-    - name: Check the request status
-      uri:
-        url: "{{provision_out.json.results[0].href}}"    # default to https://<CFME>/api/provision_requests/
-        user: "{{api_username}}"
-        password: "{{api_password}}"
-        validate_certs: false
-        method: GET
-      register: check_request_status_out 
-    - name: Show the output 
-      debug: 
-        var: check_request_status_out.json.request_state 
-    #until: false 
- 
-    
-    
-   #TODO
-   # Get the request ID to be passed to service now 
-   #\TODO
+  - name: Check the request status
+    uri:
+      url: "{{provision_out.json.results[0].href}}"    # default to https://<cfme>/api/provision_requests/
+      user: "{{api_username}}"
+      password: "{{api_password}}"
+      validate_certs: false
+      method: get
+    register: check_request_status_out 
+    until: check_request_status_out.json.request_state == "finished" 
+    retries: 100
+    delay: 10
+  - name: Show the output 
+    debug: 
+      var: check_request_status_out 
+  - name: Play the ansible Job (we will veriy the provision request for you)
+    uri:
+      url: "https://{{cfme_ip}}/api/service_catalogs/1000000000001/service_templates/{{bootstrap_service_id}}"    
+      user: "{{api_username}}"
+      password: "{{api_password}}"
+      validate_certs: false
+      method: POST
+      body: 
+        action: order
+        resource: 
+          href: "https://{{cfme_ip}}/api/service_catalogs/{{catalog_id}}/service_templates/{{bootstrap_service_id}}"
+          hosts: "{{vm_name}}"
+      body_format: json
+      when: check_request_status_out.json.status == "Ok"  
+     
+        
+        
+       #TODO
+       # Get the request ID to be passed to service now 
+       #\TODO
+     
+     
+     
+     
+     
+     
+     
