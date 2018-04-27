@@ -55,7 +55,7 @@
           href: "https://{{cfme_ip}}/api/service_catalogs/{{catalog_id}}/service_templates/{{bootstrap_service_id}}"
           hosts: "{{vm_name}}"
       body_format: json
-      when: check_request_status_out.json.status == "Ok"  
+    when: check_request_status_out.json.status == "Ok"  
      
         
         
