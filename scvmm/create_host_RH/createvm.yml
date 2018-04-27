@@ -33,11 +33,12 @@
       user: "{{api_username}}"
       password: "{{api_password}}"
       validate_certs: false
-      method: get
-    register: check_request_status_out 
+      method: GET
+    register: check_request_status_out
+    ignore_errors: yes  
     until: check_request_status_out.json.request_state == "finished" 
     retries: 100
-    delay: 10
+    delay: 30
   - name: Show the output 
     debug: 
       var: check_request_status_out 
