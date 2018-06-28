@@ -1,0 +1,71 @@
+- hosts: localhost
+  vars_files:
+    - params.yml 
+    - args.yml 
+  tasks:
+  - name: Launch the provision request (API Call) #For GCE 
+    uri:
+      url: "https://{{cfme_ip}}/api/provision_requests"    # default to https://<CFME>/api/provision_requests/
+      user: "{{api_username}}"
+      password: "{{api_password}}"
+      validate_certs: false
+      method: POST
+      body:
+        template_fields:
+          guid: "{{template_guid}}"   #be careful when choosing the template guid if (it s incorrect error 500 internal error)
+        requester:
+          owner_email: "{{owner_email}}"
+        vm_fields: 
+          vm_name: "{{vm_name}}"
+          number_of_sockets: "{{cpus}}"
+          vm_memory: "{{memory}}"
+      body_format: json 
+    register: provision_out
+  - name: Show the variable of provisionning 
+    debug: 
+      var: provision_out 
+  - name: Starting tracking the request {{ provision_out.json.results[0].id }}  
+    debug:
+      var: provision_out.json.results[0].href 
+  - name: Check the request status
+    uri:
+      url: "{{provision_out.json.results[0].href}}"    # default to https://<cfme>/api/provision_requests/
+      user: "{{api_username}}"
+      password: "{{api_password}}"
+      validate_certs: false
+      method: GET
+    register: check_request_status_out
+    ignore_errors: yes  
+    until: check_request_status_out.json.request_state == "finished" 
+    retries: 100
+    delay: 30
+  - name: Show the output 
+    debug: 
+      var: check_request_status_out 
+  - name: Play the ansible Job (we will veriy the provision request for you)
+    uri:
+      url: "https://{{cfme_ip}}/api/service_catalogs/1000000000001/service_templates/{{bootstrap_service_id}}"    
+      user: "{{api_username}}"
+      password: "{{api_password}}"
+      validate_certs: false
+      method: POST
+      body: 
+        action: order
+        resource: 
+          href: "https://{{cfme_ip}}/api/service_catalogs/{{catalog_id}}/service_templates/{{bootstrap_service_id}}"
+          hosts: "{{vm_name}}"
+      body_format: json
+    when: check_request_status_out.json.status == "Ok"  
+     
+        
+        
+       #TODO
+       # Get the request ID to be passed to service now 
+       #\TODO
+     
+     
+     
+     
+     
+     
+     

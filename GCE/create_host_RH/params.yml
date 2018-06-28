@@ -1,0 +1,12 @@
+cfme_ip: 35.237.142.53   # The IP address or the hostname of the appliance holding the API 
+owner_email: rhamdi@rehat.com
+#vm_name: testapi59
+#cpus: 1 
+#memory: 1024
+#template_guid: 241b8a86-3889-46e3-8f9d-da4f94bdd601
+template_guid: 3b112a35-e186-4567-8e81-e5b83a7a626b 
+#template_guid: 16a0be30-c322-41a4-b56a-2da2d63921b9 
+catalog_id: 1000000000001 
+flavor: 1000000000001
+
+#bootstrap_service_id: 1000000000005

@@ -1,0 +1,13 @@
+- name: a fisrt play 
+  hosts: all
+  tasks:
+  - name: Create temporary inventory 
+    add_host:
+      name: 10.142.0.2
+      groups: grp1
+
+- name: a second play 
+  hosts: grp1
+  tasks:
+  - name: run a ping 
+    ping:
