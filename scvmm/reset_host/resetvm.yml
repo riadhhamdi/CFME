@@ -1,0 +1,39 @@
+- hosts: localhost
+  vars_files:
+    - params.yml 
+    - args.yml 
+  tasks:
+  - name: trying to reset VM {{vm_name}}
+    debug:
+      msg: start
+  - name: API Call to get the VM ID
+    uri:
+      url: "https://{{cfme_ip}}/api/vms?expand=resources&attributes=name&filter[]=name={{vm_name}}"
+      user: "{{api_username}}"
+      password: "{{api_password}}"
+      validate_certs: false 
+    register: id_out
+   
+  - name: show variable 
+    debug: 
+      var: (id_out.json.resources[0]).href  
+  - name: API Call to reset VM with id "{{(id_out.json.resources[0]).id}}"
+    uri:
+      url: "{{(id_out.json.resources[0]).href}}"
+      user: "{{api_username}}"
+      password: "{{api_password}}"
+      validate_certs: false
+      method: POST
+      body: |
+          {
+          "action" : "reset"
+          }  
+    register: reset_out 
+  - name: show the reset request ID
+    debug:
+      var: reset_out  
+   #TODO
+   # Get the request ID to be passed to service now 
+   #\TODO
+   #
+   #
